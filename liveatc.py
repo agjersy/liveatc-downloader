@@ -31,19 +31,17 @@ def get_stations(icao):
     yield {'identifier': identifier, 'title': title, 'frequencies': frequencies, 'up': up}
 
 
-def download_archive(station, date, time):
+def download_archive(icao, station, date, time):
   page = requests.get(f'https://www.liveatc.net/archive.php?m={station}')
   soup = BeautifulSoup(page.content, 'html.parser')
-  archive_identifer = soup.find('option', selected=True).attrs['value']
+  archive_identifier = soup.find('option', selected=True)
+  archive_identifier = archive_identifier['value']
 
-  # https://archive.liveatc.net/kpdx/KPDX-App-Dep-Oct-01-2021-0000Z.mp3
-  filename = f'{archive_identifer}-{date}-{time}.mp3'
+  filename = f'{archive_identifier}-{date}-{time}.mp3'
 
   path = f'/tmp/{filename}'
-  url = f'https://archive.liveatc.net/kpdx/{filename}'
+  url = f'https://archive.liveatc.net/{icao}/{filename}'
   print(url)
 
   urllib.request.urlretrieve(url, path)
-
-
-# download_archive('kpdx_zse', 'Oct-01-2021', '0000Z')
+  return path
